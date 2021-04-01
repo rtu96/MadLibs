@@ -5,47 +5,31 @@
 		I'm also very proud to point out that my code is "secure" and does not depend on disabling
 		failsafes to avoid depreciated functions.
 */
-#include <stdio.h>
-#include <Windows.h>	//wanted to add a fancy animation to boot; this will allow use of sleep() but makes non-portable beyond windows
+#include <stdio.h>	//wanted to add a fancy animation to boot; this will allow use of sleep() but makes non-portable beyond windows
 
 int			selection = 0;			//Used to navigate menus
 int			sleep_delay = 300;		//In milliseconds, delay welcome print lines
 int			c;						//Used to fix tutorial skipping first fgets()
 int const	WRD_LENGTH = 20;		//Maximum word length
 
-//Init all char arrays for use later. Couldn't figure out how to have flexible input lengths.
-char	wrd1[20];
-char	wrd2[20];
-char	wrd3[20];
-char	wrd4[20];
-char	wrd5[20];
-char	wrd6[20];	
-char	wrd7[20];
-char	wrd8[20];
-char	wrd9[20];
-char	wrd10[20];
-char	wrd11[20];
-char	wrd12[20];
-char	wrd13[20];
-char	wrd14[20];
-char	wrd15[20];
-char	wrd16[20];
-char	wrd17[20];
-char	wrd18[20];
-char	wrd19[20];
+
+struct wordinput { char word[20]; };	//Created structure for words, technically could be numbers but in literal, not int
+struct wordinput response[20];			//Response array of words, so now I don't have that hot mess of 20 predefined char arrays
+										//Also yes I know [20] is technically 21 slots, but VS was complaining about "19 wasnt enough."
+										//And leaving response[0] blank because I'm too lazy.
 
 //Bool to have tutorial auto skip if user has encountered it.
 _Bool	tutorial_pass = 0; //0 == not yet, 1 == skipped
 
 void	tutorial(), vacation_theme(); //To predefine functions before they are called and defaulted to int
 
-int main(void)
+int main(void) // The main event
 {
 
 	menu_load();	//Loads menu for the first time
 	while (selection == 0)
 	{
-		printf("Type number to select option: ");	//Ask user to make a choice after menu has been loaded
+		printf(" Type number to select option: ");	//Ask user to make a choice after menu has been loaded
 		scanf_s("%d", &selection);
 		if (selection < 0 || selection > 5)			//Error Checking for menu selection, as well as resetting selection
 		{
@@ -54,7 +38,7 @@ int main(void)
 		}
 		if (selection == 1)
 		{
-			printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); //Not sure how to clear terminal yet so just using this as a "brute force"
+			printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"); //Not sure how to clear terminal yet so just using this as a "brute force"
 			theme();
 			selection = 0;
 			menu_load();
@@ -76,7 +60,7 @@ int main(void)
 	return 0;
 }
 
-int menu_load(void)
+int menu_load(void) // The opener
 {
 	/*
 	This section is just some fancy printing of the Mad Libs boot up. Totally extra, I know
@@ -132,7 +116,7 @@ int menu_load(void)
 	return 0;
 }
 
-int theme(void)
+int theme(void) // The introduction
 {
 	selection = 0; //Reset selection to 0 for reuse
 
@@ -171,7 +155,7 @@ int theme(void)
 	return 0;
 }
 
-void tutorial(void)
+void tutorial(void) // The guide
 {
 	selection = 0;
 	printf("\n\n");
@@ -182,12 +166,12 @@ void tutorial(void)
 	
 	while (selection == 0)
 	{
-		printf("\n\nType number to select option: ");	//This has been recycled from the main menu
+		printf("\n\n Type number to select option: ");	//This has been recycled from the main menu
 		scanf_s("%d", &selection);
 
 		if (selection < 0 || selection > 2)
 		{
-			printf("Error: Invalid selection!\n");
+			printf(" Error: Invalid selection!\n");
 			selection = 0;
 		}
 
@@ -197,7 +181,7 @@ void tutorial(void)
 			printf("\n	with a corresponding phrase of your choice, and after all");
 			printf("\n	blanks are filled, the game will output your words in a");
 			printf("\n	wacky story to enjoy!\n\n");
-			printf("\nPress Any Key to Continue...");
+			printf("\n Press Any Key to Continue...");
 			getch();
 
 			tutorial_pass = 1;	//User has completed tutorial, avoid asking again
@@ -208,14 +192,14 @@ void tutorial(void)
 		{
 			printf("\n	Alright well excuuuuuse me then.\n");
 			tutorial_pass = 1;	//User rejected tutorial, same as completing
-			printf("\nPress Any Key to Continue...");
+			printf("\n Press Any Key to Continue...");
 			getch();
 			return;
 		}
 	}
 }
 
-void vacation_theme(void)
+void vacation_theme(void) // The showstopper
 {
 
 	if (tutorial_pass == 0) //Check if user has completed tutorial, if not then skip
@@ -223,104 +207,104 @@ void vacation_theme(void)
 
 	while ((c = getchar()) != '\n' && c != EOF); //fix to avoid having tutorial skip first fgets()
 
-	printf("\n I need an Adjective:\n");
-	fgets(&wrd1, WRD_LENGTH, stdin);
+	printf("\n I need an Adjective:\n  ");
+	fgets(response[1].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need another Adjective:\n");
-	fgets(&wrd2, WRD_LENGTH, stdin);
+	printf("\n\n I need another Adjective:\n  ");
+	fgets(response[2].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a noun: \n");
-	fgets(&wrd3, WRD_LENGTH, stdin);
+	printf("\n\n I need a noun: \n  ");
+	fgets(response[3].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need another noun: \n");
-	fgets(&wrd4, WRD_LENGTH, stdin);
+	printf("\n\n I need another noun: \n  ");
+	fgets(response[4].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a plural noun: \n");
-	fgets(&wrd5, WRD_LENGTH, stdin);
+	printf("\n\n I need a plural noun: \n  ");
+	fgets(response[5].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a game: \n");
-	fgets(&wrd6, WRD_LENGTH, stdin);
+	printf("\n\n I need a game: \n  ");
+	fgets(response[6].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a plural noun: \n");
-	fgets(&wrd7, WRD_LENGTH, stdin);
+	printf("\n\n I need a plural noun: \n  ");
+	fgets(response[7].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a verb ending in *ing*: \n");
-	fgets(&wrd8, WRD_LENGTH, stdin);
+	printf("\n\n I need a verb ending in *ing*: \n  ");
+	fgets(response[8].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need another verb ending in *ing*: \n");
-	fgets(&wrd9, WRD_LENGTH, stdin);
+	printf("\n\n I need another verb ending in *ing*: \n  ");
+	fgets(response[9].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a plural noun: \n");
-	fgets(&wrd10, WRD_LENGTH, stdin);
+	printf("\n\n I need a plural noun: \n  ");
+	fgets(response[10].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a verb ending in *ing*: \n");
-	fgets(&wrd11, WRD_LENGTH, stdin);
+	printf("\n\n I need a verb ending in *ing*: \n  ");
+	fgets(response[11].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a noun: \n");
-	fgets(&wrd12, WRD_LENGTH, stdin);
+	printf("\n\n I need a noun: \n  ");
+	fgets(response[12].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a plant: \n");
-	fgets(&wrd13, WRD_LENGTH, stdin);
+	printf("\n\n I need a plant: \n  ");
+	fgets(response[13].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a part of the body: \n");
-	fgets(&wrd14, WRD_LENGTH, stdin);
+	printf("\n\n I need a part of the body: \n  ");
+	fgets(response[14].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a place: \n");
-	fgets(&wrd15, WRD_LENGTH, stdin);
+	printf("\n\n I need a place: \n  ");
+	fgets(response[15].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a verb ending in *ing*: \n");
-	fgets(&wrd16, WRD_LENGTH, stdin);
+	printf("\n\n I need a verb ending in *ing*: \n  ");
+	fgets(response[16].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need an adjective: \n");
-	fgets(&wrd17, WRD_LENGTH, stdin);
+	printf("\n\n I need an adjective: \n  ");
+	fgets(response[17].word, WRD_LENGTH, stdin);
 
-	printf("\n\n I need a number: \n");
-	fgets(&wrd18, WRD_LENGTH, stdin);
+	printf("\n\n I need a number: \n  ");
+	fgets(response[18].word, WRD_LENGTH, stdin);
 
-	printf("\n\n And finally, I need a plural noun: \n");
-	fgets(&wrd19, WRD_LENGTH, stdin);
+	printf("\n\n And finally, I need a plural noun: \n  ");
+	fgets(response[19].word, WRD_LENGTH, stdin);
 	
 	printf("\n Here we go!");
 
+	cleanup(); // Calling cleanup function to remove \n characters from fgets input
+
 	/*
-	Print out all the answers! Unfortunately I can't figure out to delimit the \n in
-	all answers, so the paragraph prints out a new line and it looks pretty ugly in the
-	console. I've done my best to mitigate that here but it still looks pretty bad.
+	Print out all the answers! Now with \n character removal from fgets for cleaner output with cleanup() function.
 	*/
 
 	printf("\n");
-	printf("\n A vacation is when you take a trip to some %s",				&wrd1);
-	printf(" place with your %s family.",									&wrd2);
-	printf("\n Usually you go to some place that is near a/an %s",			&wrd3);
-	printf(" or up on a/an %s",												&wrd4);
-	printf(" A good vacation place is one where you can ride %s",			&wrd5);
-	printf(" or play %s or go hunting for ",								&wrd6);
-	printf("%s",															&wrd7);
-	printf(" I like to spend my time %s",									&wrd8);
-	printf(" or %s",														&wrd9);
-	printf(" When parents go on a vacation, they spend their time eating");
-	printf("\n three %s a day, and fathers play golf, and mothers",			&wrd10);
-	printf(" sit around %s Last summer, my little brother",					&wrd11);
-	printf(" fell in a/an %s and got poison",								&wrd12);
-	printf(" %s",															&wrd13);
-	printf(" all over his %s ",												&wrd14);
-	printf(" My family is going to go to (the) %s and I will practice",		&wrd15);
-	printf(" %s Parents",													&wrd16);
-	printf(" need more vacations than kids because parents are always very");
-	printf(" %s and because they have to work",								&wrd17);
-	printf(" %s",															&wrd18);
-	printf(" hours every day all year making enough %s",					&wrd19);
-	printf(" to pay for the vacation");
+	printf("\n A vacation is when you take a trip to some %s place with your %s family.",	response[1].word, response[2].word);
+	printf("\n Usually you go to some place that is near a/an %s or up on a/an %s",			response[3].word, response[4].word);
+	printf("\n A good vacation place is one where you can ride %s or play %s or go",		response[5].word, response[6].word);
+	printf("\n hunting for %s. I like to spend my time %s or %s",		  response[7].word, response[8].word, response[9].word);
+	printf("\n When parents go on a vacation, they spend their time eating three");
+	printf("\n %s a day, and fathers play golf, and mothers sit around %s.",				response[10].word, response[11].word);
+	printf("\n Last summer, my little brother fell in a/an %s and got poison %s",			response[12].word, response[13].word);
+	printf("\n all over his %s. My family is going to (the) %s and I will practice",		response[14].word, response[15].word);
+	printf("\n %s. Parents need more vacations than kids because parents are always very",	response[16].word);
+	printf("\n %s and because they have to work %s hours every day all year making enough", response[17].word, response[18].word);
+	printf("\n %s to pay for the vacation!",												response[19].word);
+
 
 	//allow the user to read at their own pace before kicking out back to the main menu
-	printf("\n\n\nPress Any Key to Continue...");
+	printf("\n\n\n Press Any Key to Continue...");
 	getch();
 	return;
 }
 
-int credits(void)
+int credits(void) // The nomad
 {
-	printf("\nMade with love by Raymond Tu\n\n");
-	printf("Press Any Key to Continue...");
+	printf("\n Made with blood, sweat, tears, and spite by Raymond Tu\n\n");
+	printf(" Press Any Key to Continue...");
 	getch();
+}
+
+int cleanup(void) // Used to cleanup input responses at end for nicer looking paragraph
+{
+	int i; //counter i
+	for (i = 0; i < 20; i++)
+	{
+		response[i].word[strcspn(response[i].word, "\n")] = 0;
+	}
+	return 0;
 }
