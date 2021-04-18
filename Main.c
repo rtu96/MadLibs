@@ -3,26 +3,35 @@
 		It features theme selection as well for endless fun.
 
 		I'm also very proud to point out that my code is "secure" and does not depend on disabling
-		failsafes to avoid depreciated functions.
+		failsafes to use depreciated functions.
+
+		On the other hand however, I cannot in good conscience say that my code is completely "secure" as I am an
+		ameteur, and this assumes at least just number inputs, not null inputs and character inputs in wrong places.
 */
-#include <stdio.h>	//wanted to add a fancy animation to boot; this will allow use of sleep() but makes non-portable beyond windows
+#include <stdio.h>
+#include <string.h>
+#include <windows.h>	//wanted to add a fancy animation to boot; this will allow use of sleep() but makes non-portable beyond windows
 
 int			selection = 0;			//Used to navigate menus
 int			sleep_delay = 300;		//In milliseconds, delay welcome print lines
 int			c;						//Used to fix tutorial skipping first fgets()
 int const	WRD_LENGTH = 20;		//Maximum word length
 
-
-struct wordinput { char word[20]; };	//Created structure for words, technically could be numbers but in literal, not int
-struct wordinput response[20];			//Response array of words, so now I don't have that hot mess of 20 predefined char arrays
-										//Also yes I know [20] is technically 21 slots, but VS was complaining about "19 wasnt enough."
-										//And leaving response[0] blank because I'm too lazy.
+struct wordinput { char word[20]; };					//Created structure for words, technically could be numbers but in literal, not int
+struct wordinput response[20];							//Response array of words, so now I don't have that hot mess of 20 predefined char arrays
+char cache[1700];
+char* p = cache;
 
 //Bool to have tutorial auto skip if user has encountered it.
 _Bool	tutorial_pass = 0; //0 == not yet, 1 == skipped
 
-void	tutorial(), vacation_theme(); //To predefine functions before they are called and defaulted to int
+// Placeholder for filename, NULL as temp input
+FILE* filename = NULL;
 
+void	tutorial(), vacation_theme(), credits(); //To predefine functions before they are called and defaulted to int
+int		menu_load(), theme(), cleanup(), save(), save_prompt(); // Predefine functions as int return to avoid assumptions
+static int input_check();						// Predefine functions to avoid assumptions
+char	*mystrcat(char* dest, char* src);		// Again, predefine
 int main(void) // The main event
 {
 
@@ -31,7 +40,7 @@ int main(void) // The main event
 	{
 		printf(" Type number to select option: ");	//Ask user to make a choice after menu has been loaded
 		scanf_s("%d", &selection);
-		if (selection < 0 || selection > 5)			//Error Checking for menu selection, as well as resetting selection
+		if (selection < 0 || selection > 4)			//Error Checking for menu selection, as well as resetting selection
 		{
 			printf("Error: Invalid selection!\n");
 			selection = 0;
@@ -289,14 +298,61 @@ void vacation_theme(void) // The showstopper
 	//allow the user to read at their own pace before kicking out back to the main menu
 	printf("\n\n\n Press Any Key to Continue...");
 	getch();
+
+	// Prints to cache for saving. It gets especially ugly 
+	cache[0] = '\0';
+	mystrcat(cache, "Made with Mad Libs!\n\n");
+	mystrcat(cache, "A vacation is when you take a trip to some");
+	mystrcat(cache, response[1].word);
+	mystrcat(cache, " place with your ");
+	mystrcat(cache, response[2].word);
+	mystrcat(cache, " family.\nUsually you go to some place that is near a/an ");
+	mystrcat(cache, response[3].word);
+	mystrcat(cache, " or up on a/an ");
+	mystrcat(cache, response[4].word);
+	mystrcat(cache, ".\nA good vacation place is one where you can ride ");
+	mystrcat(cache, response[5].word);
+	mystrcat(cache, " or play ");
+	mystrcat(cache, response[6].word);
+	mystrcat(cache, " or go hunting for ");
+	mystrcat(cache, response[7].word);
+	mystrcat(cache, ".\n I like to spend my time ");
+	mystrcat(cache, response[8].word);
+	mystrcat(cache, " or ");
+	mystrcat(cache, response[9].word);
+	mystrcat(cache, ". When parents go on a vacation, they spend their time eating three ");
+	mystrcat(cache, response[10].word);
+	mystrcat(cache, " a day, and fathers play golf, \nand mothers sit around ");
+	mystrcat(cache, response[11].word);
+	mystrcat(cache, ". Last summer, my little brother fell in a/an ");
+	mystrcat(cache, response[12].word);
+	mystrcat(cache, " and got poison ");
+	mystrcat(cache, response[13].word);
+	mystrcat(cache, " all over his ");
+	mystrcat(cache, response[14].word);
+	mystrcat(cache, ". My family is going to (the)\n");
+	mystrcat(cache, response[15].word);
+	mystrcat(cache, " and I will practice ");
+	mystrcat(cache, response[16].word);
+	mystrcat(cache, ". Parents need more vacations than kids because parents are always very \n");
+	mystrcat(cache, response[17].word);
+	mystrcat(cache, " and because they have to work ");
+	mystrcat(cache, response[18].word);
+	mystrcat(cache, " hours every day all year making enough ");
+	mystrcat(cache, response[19].word);
+	mystrcat(cache, " to pay for the vacation!");
+	
+	//Asks user if they want to save the output
+	save_prompt();
 	return;
 }
 
-int credits(void) // The nomad
+void credits(void) // The nomad
 {
 	printf("\n Made with blood, sweat, tears, and spite by Raymond Tu\n\n");
 	printf(" Press Any Key to Continue...");
 	getch();
+	return;
 }
 
 int cleanup(void) // Used to cleanup input responses at end for nicer looking paragraph
@@ -307,4 +363,116 @@ int cleanup(void) // Used to cleanup input responses at end for nicer looking pa
 		response[i].word[strcspn(response[i].word, "\n")] = 0;
 	}
 	return 0;
+}
+
+int save_prompt(void)
+{
+	/*
+	* Pretty much same as menu() but this time for yes/no input.
+	*/
+	printf("\n Would you like to save this?");
+	printf("\n 1 = Yes		2 = No");
+	selection = 0;
+	while (selection == 0)
+	{
+		printf("\n\n Type number to select option: ");	//Ask user to make a choice after menu has been loaded
+		scanf_s("%d", &selection);
+		if (selection < 0 || selection > 2)			//Error Checking for menu selection, as well as resetting selection
+		{
+			printf("Error: Invalid selection!\n");
+			selection = 0;
+		}
+		if (selection == 1)
+		{
+			save();
+			return 0;
+		}
+		if (selection == 2)
+		{
+			return 0;
+		}
+	}
+}
+
+int save(void)
+{
+	/*
+	* This function was found online in conjunction for the line input check down below, with a little bit more for opening and writing the contents of cache into a file named by a user.
+	*/
+
+	// 0 is OK
+	// 1 is No Input
+	// 2 is Too Long of an input
+	int rc;
+	_Bool status = 0;
+	char buff[20];
+
+	while (status == 0)
+	{
+		while ((c = getchar()) != '\n' && c != EOF); //Clearing the previous getchar(); to avoid skipping input
+
+		rc = input_check("Enter filename ending in .txt> ", buff, sizeof(buff));
+		if (rc == 1)
+		{
+			printf("\nNo input\n");
+			save();
+		}
+
+		if (rc == 2) // Checks for too long of an input
+		{
+			printf("Input is too long [%s]\n", buff);
+			save();
+		}
+		if (rc == 0)
+		{
+			printf("OK [%s]\n", buff);					// OK to use filename
+
+			fopen_s(&filename, buff, "w");				// Opens/creates filename in write mode
+			fwrite(cache, sizeof(cache), 1, filename);	// Writes contents of cache to filename set by user
+			int fclose(FILE * filename);				// Close file
+
+			memset(cache, 0, sizeof(cache));			// Clears out Cache for reuse in next game
+			status = 1;
+			return 0;
+		}
+	}
+}
+
+static int input_check(char* prmpt, char* buff, size_t sz) 
+{
+	/*
+	* This code was found online to check for a line input, making sure that the user does not input null nor too long of a file
+	*/
+	int ch, extra;
+
+	// Get line with buffer overrun protection.
+	if (prmpt != NULL) {
+		printf("%s", prmpt);
+		fflush(stdout);
+	}
+	if (fgets(buff, sz, stdin) == NULL)
+		return 1;
+
+	// If it was too long, there'll be no newline. In that case, we flush
+	// to end of line so that excess doesn't affect the next call.
+	if (buff[strlen(buff) - 1] != '\n') {
+		extra = 0;
+		while (((ch = getchar()) != '\n') && (ch != EOF))
+			extra = 1;
+		return (extra == 1) ? 2 : 0;
+	}
+
+	// Otherwise remove newline and give string back to caller.
+	buff[strlen(buff) - 1] = '\0';
+	return 0;
+}
+
+char* mystrcat(char* dest, char* src)
+{	
+	/*
+	* So this is a custom strcat as read online, because strcat is "unsafe" and does not offer good performance for larger character arrays
+	*/
+	while (*dest) dest++;
+	while (*dest++ = *src++);
+	return --dest;
 }
